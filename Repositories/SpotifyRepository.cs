@@ -1,4 +1,5 @@
 ﻿using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -10,29 +11,36 @@ public interface ISpotifyRepository
 public class SpotifyRepository : ISpotifyRepository
 {
     private readonly HttpClient _httpClient;
-    private readonly string _apiBaseUrl;
+    private readonly SpotifyAuthService _authService;
 
-    public SpotifyRepository(HttpClient httpClient)
+    public SpotifyRepository(HttpClient httpClient, SpotifyAuthService authService)
     {
         _httpClient = httpClient;
-        _apiBaseUrl = "https://api.spotify.com/v1"; // URL base da API do Spotify
+        _authService = authService;
     }
 
     public async Task<string> SearchMusicAsync(string query)
     {
-        // Construa a URL da requisição
-        var url = $"{_apiBaseUrl}/search?type=track&q={query}";
+        var token = await _authService.GetAccessTokenAsync(); // Obter o token de acesso
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);  // Adicionar ao cabeçalho
 
-        // Faça a requisição GET para o Spotify
-        var response = await _httpClient.GetAsync(url);
+        // Definindo um limite para a quantidade de resultados
+        int limit = 10;
 
-        // Verifique se a resposta foi bem-sucedida
-        response.EnsureSuccessStatusCode();
+        // A lógica para buscar a música no Spotify
+        // Suponha que você esteja buscando e retornando os dados de música como uma string ou outro tipo
+        var response = await _httpClient.GetAsync($"https://api.spotify.com/v1/search?q={query}&type=track&limit={limit}");
+        // Log para verificar o conteúdo da resposta
+        var content = await response.Content.ReadAsStringAsync();
+        Console.WriteLine($"Spotify Response: {content}");  // Log da resposta da API
 
-        // Leia a resposta como string
-        var responseContent = await response.Content.ReadAsStringAsync();
-
-        // Retorne o conteúdo da resposta
-        return responseContent;
+        if (response.IsSuccessStatusCode)
+        {
+            return content;  // Retorna o conteúdo da resposta
+        }
+        else
+        {
+            return $"Error: {response.StatusCode} - {content}";  // Retorna o erro com o código de status e a mensagem de erro
+        }
     }
 }

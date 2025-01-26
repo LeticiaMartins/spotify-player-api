@@ -30,6 +30,7 @@ builder.Services.AddCors(options =>
 // Registrar repositório e serviço
 builder.Services.AddHttpClient<ISpotifyRepository, SpotifyRepository>();
 builder.Services.AddScoped<ISpotifyService, SpotifyService>();
+builder.Services.AddScoped<SpotifyAuthService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
