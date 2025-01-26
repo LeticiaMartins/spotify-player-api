@@ -2,6 +2,7 @@
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 public interface ISpotifyRepository
 {
@@ -34,13 +35,29 @@ public class SpotifyRepository : ISpotifyRepository
         var content = await response.Content.ReadAsStringAsync();
         Console.WriteLine($"Spotify Response: {content}");  // Log da resposta da API
 
-        if (response.IsSuccessStatusCode)
-        {
-            return content;  // Retorna o conteúdo da resposta
+        if(response.IsSuccessStatusCode)
+    {
+            // Parse o JSON da resposta para extrair as informações desejadas
+            var result = JsonConvert.DeserializeObject<JObject>(content);
+            var tracks = result["tracks"]["items"];
+
+            // Crie uma lista com os dados simplificados para retornar
+            var simplifiedResult = new List<string>();
+
+            foreach (var track in tracks)
+            {
+                string trackName = track["name"].ToString();
+                string albumName = track["album"]["name"].ToString();
+                string previewUrl = track["preview_url"]?.ToString() ?? "Não disponível";
+
+                simplifiedResult.Add($"Track: {trackName}, Album: {albumName}, Preview URL: {previewUrl}");
+            }
+
+            // Retorne os dados simplificados
+            return string.Join("\n", simplifiedResult);
         }
-        else
-        {
-            return $"Error: {response.StatusCode} - {content}";  // Retorna o erro com o código de status e a mensagem de erro
-        }
+
+        return string.Empty; // Ou algo mais apropriado em caso de erro
     }
+    
 }
