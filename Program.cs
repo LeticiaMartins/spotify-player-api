@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Carregar variáveis de ambiente e User Secrets (para desenvolvimento local)
 builder.Configuration
     .AddEnvironmentVariables()
     .AddUserSecrets<Program>();
@@ -17,17 +16,15 @@ if (string.IsNullOrEmpty(spotifyClientId) || string.IsNullOrEmpty(spotifyClientS
     throw new Exception("Spotify credentials are missing. Check your environment variables or User Secrets.");
 }
 
-// Configuração do CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngular",
         policy => policy
-            .WithOrigins("http://localhost:4200") // Front-end Angular
+            .WithOrigins("http://localhost:4200")
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
 
-// Registrar repositório e serviço
 builder.Services.AddHttpClient<ISpotifyRepository, SpotifyRepository>();
 builder.Services.AddScoped<ISpotifyService, SpotifyService>();
 builder.Services.AddScoped<SpotifyAuthService>();
@@ -35,7 +32,6 @@ builder.Services.AddScoped<SpotifyAuthService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
-// Configuração do Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Spotify Player API", Version = "v1" });
@@ -50,7 +46,6 @@ app.UseCors("AllowAngular");
 app.UseAuthorization();
 app.MapControllers();
 
-// Middleware do Swagger
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {

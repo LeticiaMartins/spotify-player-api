@@ -28,12 +28,9 @@ public class SpotifyRepository : ISpotifyRepository
         // Definindo um limite para a quantidade de resultados
         int limit = 10;
 
-        // A lógica para buscar a música no Spotify
-        // Suponha que você esteja buscando e retornando os dados de música como uma string ou outro tipo
         var response = await _httpClient.GetAsync($"https://api.spotify.com/v1/search?q={query}&type=track&limit={limit}");
         // Log para verificar o conteúdo da resposta
         var content = await response.Content.ReadAsStringAsync();
-        Console.WriteLine($"Spotify Response: {content}");  // Log da resposta da API
 
         if(response.IsSuccessStatusCode)
     {
@@ -53,11 +50,10 @@ public class SpotifyRepository : ISpotifyRepository
                 simplifiedResult.Add($"Track: {trackName}, Album: {albumName}, Preview URL: {previewUrl}");
             }
 
-            // Retorne os dados simplificados
             return string.Join("\n", simplifiedResult);
         }
 
-        return string.Empty; // Ou algo mais apropriado em caso de erro
+        return string.Empty; 
     }
     
 }
