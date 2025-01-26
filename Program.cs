@@ -27,6 +27,10 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod());
 });
 
+// Registrar repositório e serviço
+builder.Services.AddHttpClient<ISpotifyRepository, SpotifyRepository>();
+builder.Services.AddScoped<ISpotifyService, SpotifyService>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
