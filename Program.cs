@@ -38,6 +38,8 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+app.UseRouting();
+
 app.UseCors("AllowAngular");
 
 app.UseAuthorization();
